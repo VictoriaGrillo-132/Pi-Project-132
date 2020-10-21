@@ -2,26 +2,24 @@ import os
 from tkinter import *
 from datetime import datetime
 import pygame
-
+import random
 
 
 #current version of the game
 TITLE = "Event Horizon"
-VERSION = 0.0
+#VERSION = 0.0
 LAST_UPDATE = datetime.fromtimestamp(os.path.getmtime(__file__))
 AUTHOR = 'JA, ID, VG'
 
 
 #setting GUI size
-width = 900
-height = 500
+#width = 900
+#height = 500
 #window= Tk()
 #window.geometry('{}x{}'.format(width, height))
 #window.title(TITLE)
 #screen size
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 400
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
 
 #setting up the keys for the game
@@ -38,6 +36,10 @@ from pygame.locals import(
 #initialize pygame
 pygame.init()
 
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 400
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
 #to keep the game running
 running = True
 
@@ -53,10 +55,19 @@ while running:
         elif event.type == QUIT:
             running = False
 
+        #adding a new enemy
+        elif event.type == ADDENEMY:
+            #creating the new enemy and add it to the sprite groups
+            new_enemy = Enemy()
+            enemies.add(new_enemy)
+            all_sprites.add(new_enemy)
+
     #getting the key that is currently being pressed
     pressed_keys = pygame.key.get_pressed()
     #updating player sprite due to the user pressing the keys
     player.update(pressed_keys)
+    #updating enemy poistion
+    enemies.update()
 
     #screen filled with black
     screen.fill((0, 0, 0))
@@ -69,7 +80,7 @@ screen.fill((255,255,255))
 surf = pygame.Surface((50, 50))
 #giving the surface a color so it can be separate from the background
 surf.fill((0, 0, 0))
-rect = surf.get.rect()
+rect = surf.get_rect()
 
 #making the player object by using pygmae.sprite.Sprite
 #This allows us to make the game how we want i.e. making the player start on one side of the
@@ -84,7 +95,14 @@ class Player(pygame.sprite.Sprite):
 screen.fill((0,0,0))
 
 #Having the player drawn on the screen
-screen.blit(player.surf, player.rect)
+for entity in all_sprites:
+    screen.blit(entity.surf, entity.rect)
+#seeing if enemies have collided with the player
+if pygame.sprite.spritecollideany(player, enemies):
+    #if yes, player dies and the loop stops
+    player.kill()
+    running = False
+##screen.blit(player.surf, player.rect)
 #updating the display for the game
 pygame.display.flip()
 
@@ -113,6 +131,36 @@ def update(self, pressed_keys):
         self.rect.bottom = SCREEN_HEIGHT
 
     
+#defining enemys by the pygame sprite
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Enemy, self).__init__()
+        self.surf = pygame.Surface((20,10))
+        self.surf.fill((255, 255, 255))
+        self.rect = self.surf.get_rect(
+            center=(
+                random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),
+                random.randint(0, SCREEN_HEIGHT),
+            )
+        )
+        self.speed = random.randints(5, 20) #Will be how fast the enemy moves
+    #getting the sprite to move based on the speed
+    #removing it when it goes past the left edge of the screen
+    def update(self):
+        self.rect.move_ip(-self.speed, 0)
+        if self.rect.right < 0:
+            self.kill()
+#creating a custom event for adding an enemy
+ADDENEMY = pygame.USEREVENT + 1
+pygame.time.set_timer(ADDENEMY, 250)
+
+#when the enemy is attacked with the player
+player = Player()
+enemies = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+all_sprite.add(player)
+running = True
+
 
 
 
