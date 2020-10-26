@@ -25,6 +25,7 @@ from pygame.locals import(
     K_DOWN,
     K_LEFT,
     K_RIGHT,
+    K_SPACE,
     K_ESCAPE,
     KEYDOWN,
     QUIT,
@@ -61,6 +62,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         elif self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
+        
 
 #defining enemys by the pygame sprite
 class Enemy(pygame.sprite.Sprite):
@@ -80,7 +82,12 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
-            self.kill()    
+            self.kill()
+class Bullet(pygame.sprite.Sprite):
+    super(Bullet, self).__init__()
+    self.surf = pygame.Surface((15, 5))
+    self.surf.fill((255, 0, 0))
+    self.rect = self.surf.get_rect()
 
 #initialize pygame
 pygame.init()
@@ -120,6 +127,9 @@ while running:
             enemies.add(new_enemy)
             all_sprites.add(new_enemy)
 
+        
+        
+
     #getting the key that is currently being pressed
     pressed_keys = pygame.key.get_pressed()
     #updating player sprite due to the user pressing the keys
@@ -132,6 +142,7 @@ while running:
     #Having the player drawn on the screen
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
+        
     #seeing if enemies have collided with the player
     if pygame.sprite.spritecollideany(player, enemies):
         #if yes, player dies and the loop stops
