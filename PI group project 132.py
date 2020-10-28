@@ -34,6 +34,8 @@ from pygame.locals import(
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 400
 
+RED = (255, 0, 0)
+
 #making the player object by using pygmae.sprite.Sprite
 #This allows us to make the game how we want i.e. making the player start on one side of the
 #screena and also have the attacks come from the other side of the screen
@@ -52,6 +54,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.move_ip(-5, 0)
         if pressed_keys[K_RIGHT]:
             self.rect.move_ip(5, 0)
+        if pressed_keys[K_SPACE]:
+            Bullet.shoot(self)
 
         #keeping the player from going out of bounds
         if self.rect.left < 0:
@@ -62,7 +66,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         elif self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
-        
 
 #defining enemys by the pygame sprite
 class Enemy(pygame.sprite.Sprite):
@@ -76,7 +79,7 @@ class Enemy(pygame.sprite.Sprite):
                 random.randint(0, SCREEN_HEIGHT),
             )
         )
-        self.speed = random.randint(1, 5) #Will be how fast the enemy moves
+        self.speed = 2 #Will be how fast the enemy moves
     #getting the sprite to move based on the speed
     #removing it when it goes past the left edge of the screen
     def update(self):
@@ -84,10 +87,41 @@ class Enemy(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 class Bullet(pygame.sprite.Sprite):
-    super(Bullet, self).__init__()
-    self.surf = pygame.Surface((15, 5))
-    self.surf.fill((255, 0, 0))
-    self.rect = self.surf.get_rect()
+    def __init__(self):
+        super(Bullet, self).__init__()
+        self.surf = pygame.Surface((15, 5))
+        self.surf.fill((255, 0, 0))
+        self.rect = self.surf.get_rect()
+        self.speed = 3 #how fast the bullet will be to attack the enemy
+
+        self.image.set_colorkey(RED)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centrex = x
+        self.speedy = -10
+    def __init__(self, x, y):
+        self.radius = 15
+        self.speed = 3
+        self.x = x
+        self.y = y
+    def shoot(self):
+        x = 1
+        y = 1
+        self.shooting = True
+        while self.shooting:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    #quit()
+            pygame.time.Clock().tick(100)
+
+            if y <= 0:
+                self.shooting = False
+    def update(self):
+        self.y -= self.speedy
+    def draw(self):
+        pygame.draw.circle(d, (255, 0, 0), (self.x, self.y), self.radius)
+    
 
 #initialize pygame
 pygame.init()
@@ -107,10 +141,18 @@ all_sprites.add(player)
 
 #to keep the game running
 running = True
-
 #Main loop for game
 while running:
     for event in pygame.event.get():
+        if event.type == pygame.K_SPACE:
+            bullets.append(bullet(p.x+p.width//2, p.y))
+            for b in bullets:
+                b.update()
+                if b.y < 0:
+                    bullets.remove(b)
+            for b in bullets:
+                b.draw()
+                
         #seeing if the player or user hits a key
         if event.type == KEYDOWN:
             #if escape key is pressed, it will stop the loop
