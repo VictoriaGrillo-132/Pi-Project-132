@@ -21,6 +21,7 @@ AUTHOR = 'JA, ID, VG'
 
 #setting up the keys for the game
 from pygame.locals import(
+    RLEACCEL,
     K_UP,
     K_DOWN,
     K_LEFT,
@@ -38,12 +39,13 @@ RED = (255, 0, 0)
 
 #making the player object by using pygmae.sprite.Sprite
 #This allows us to make the game how we want i.e. making the player start on one side of the
-#screena and also have the attacks come from the other side of the screen
+#screen and also have the attacks come from the other side of the screen
+#custom made sprite is used for the player character 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.Surface((75, 25))
-        self.surf.fill((255, 255, 255))
+        self.surf = pygame.image.load("pcship.png").convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
     def update(self, pressed_keys):
         if pressed_keys[K_UP]:
