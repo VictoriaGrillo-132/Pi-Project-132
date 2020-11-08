@@ -1,7 +1,10 @@
 import pygame, sys
 import random
 
+#color white RGB code
 WHITE = (255, 255, 255)
+
+#function that allows text to be displayed
 font_name = pygame.font.match_font('arial')
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
@@ -9,7 +12,9 @@ def draw_text(surf, text, size, x, y):
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
+
     
+#defines how the player appears and both the player and bullet are in the same position    
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -21,7 +26,8 @@ class Player(pygame.sprite.Sprite):
 
     def create_bullet(self):
         return Bullet(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-
+    
+#defines what the bullets look like and how fast they move
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
@@ -40,7 +46,9 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("sharknpc.png").convert()
         self.rect = self.image.get_rect(center=(random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),random.randint(0, SCREEN_HEIGHT),))
-        self.speed = 1 #Will be how fast the enemy moves
+        #Will be how fast the enemy moves
+        self.speed = 1
+        
     #getting the sprite to move based on the speed
     #removing it when it goes past the left edge of the screen
     def update(self):
@@ -48,6 +56,7 @@ class Enemy(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
+#defines how the background will look
 class Background(pygame.sprite.Sprite):
     def __init__(self, image_file, location):
         self.image = pygame.image.load(image_file)
@@ -55,41 +64,44 @@ class Background(pygame.sprite.Sprite):
         self.rect.left, self.rect.top = location
 
 
-
+#initializes pygame
 pygame.init()
+#frames per second
 clock = pygame.time.Clock()
+#screen dimensions
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 400
+#makes the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.mouse.set_visible(False) 
 
+#calls the player class and makes a player group for sprites
 player = Player()
 player_group = pygame.sprite.Group()
 player_group.add(player)
-
+#defines the sprites groups
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
 enemy= pygame.sprite.Group()
-
-
-
 bullet = pygame.sprite.Group()
-
+#displays the title of the game & creates the background image
 pygame.display.set_caption("Event Horizon")
 Background = Background('space.png', [0,0])
-
+#creates enemys within the game
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 250)
+#defines score and sets value to zero
 score = 0
-
+################################################
+# Main Program
+################################################
 running = True
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-            
+        #when left side of the mouse is pressed, one bullet is fired per click    
         elif event.type == pygame.MOUSEBUTTONDOWN:
             bullet.add(player.create_bullet())
             
@@ -104,22 +116,22 @@ while running:
     #if yes, player dies and the loop stops and game is over
     hits = pygame.sprite.spritecollide(player, enemy, False)
     if hits:
-        running = False
+        pygame.quit()
+        print("Game Over. Your score was " + str(score) + '.')
+        break
 
     #when the bullet hits the enemy, the enemy dies
     hits = pygame.sprite.groupcollide(enemy, bullet, True, True)
     for hit in hits:
         score += 1
-        print(score)
         e = Enemy()
         all_sprites.add(e)
         enemy.add(e)
 
 
-    
+    #drawing things/ objects on the display
     screen.fill((0, 0, 0))
     screen.blit(Background.image, Background.rect)
-    #draw_text(screen, str(score), 18, SCREEN_WIDTH/2, SCREEN_HEIGHT )
     enemy.draw(screen)
     bullet.draw(screen)
     player_group.draw(screen)
@@ -128,4 +140,5 @@ while running:
     bullet.update()
     enemy.update()
     pygame.display.flip()
+    #frames per second
     clock.tick(120)
