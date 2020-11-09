@@ -1,5 +1,14 @@
+########################################################
+#Members: Joshua Authement, Ian Duncan, Victoria Grillo
+#Description: Final Pi Project CSC 132-Event Horizon
+########################################################
+
+
+#imports modules
 import pygame, sys
 import random
+from time import sleep
+from pygame import mixer
 
 #color white RGB code
 WHITE = (255, 255, 255)
@@ -44,7 +53,7 @@ class Bullet(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("sharknpc.png").convert()
+        self.image = pygame.image.load("enemy.png").convert()
         self.rect = self.image.get_rect(center=(random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),random.randint(0, SCREEN_HEIGHT),))
         #Will be how fast the enemy moves
         self.speed = 1
@@ -63,14 +72,20 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = location
 
-
+#game instructions
+instructions= "Use the mouse to move around. Use the left mouse button to shoot. Don't get hit."
 #initializes pygame
 pygame.init()
+#setup for sound
+mixer.init()
 #frames per second
 clock = pygame.time.Clock()
 #screen dimensions
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 400
+#prints instructions then waits for a second
+print(instructions)
+sleep(7)
 #makes the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.mouse.set_visible(False) 
@@ -90,11 +105,17 @@ Background = Background('space.png', [0,0])
 #creates enemys within the game
 ADDENEMY = pygame.USEREVENT + 1
 pygame.time.set_timer(ADDENEMY, 250)
+#load and play background music
+#Sound Source: http://ccmixter.org/files/stevebass60/62131
+#License: http://creativecommons.org/licenses/by-nc/3.0/legalcode
+mixer.music.load("stevebass60_-_Black_in_Space_1.mp3")
+mixer.music.play(-1)
 #defines score and sets value to zero
 score = 0
 ################################################
 # Main Program
 ################################################
+
 running = True
 while running:
     for event in pygame.event.get():
