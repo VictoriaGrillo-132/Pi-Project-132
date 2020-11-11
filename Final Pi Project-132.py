@@ -27,7 +27,7 @@ def draw_text(surf, text, size, x, y):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("pcship.png").convert()
+        self.image = pygame.image.load("pcship.png").convert_alpha()
         self.rect = self.image.get_rect(center = (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
     def update(self):
@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
-        self.image = pygame.image.load("laser.png").convert()
+        self.image = pygame.image.load("laser.png").convert_alpha()
         self.rect = self.image.get_rect(center = (pos_x, pos_y))
 
     def update(self):
@@ -53,7 +53,7 @@ class Bullet(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("enemy.png").convert()
+        self.image = pygame.image.load("enemy.png").convert_alpha()
         self.rect = self.image.get_rect(center=(random.randint(SCREEN_WIDTH + 20, SCREEN_WIDTH + 100),random.randint(0, SCREEN_HEIGHT),))
         #Will be how fast the enemy moves
         self.speed = 1
